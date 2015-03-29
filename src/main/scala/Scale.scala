@@ -31,7 +31,7 @@ object Scale {
 
   def dorianScale(note: String) = scale(3, defaultStartPitch, note)
 
-  //...
+  //... TODO other modes
 
   def minorScale(note: String) = scale(0, 2, note)
 
