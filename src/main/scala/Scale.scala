@@ -26,17 +26,20 @@ object Scale {
     scaleStream.map{case (d, h, n) => n + h}
   }
 
+  def minorScale(note: String) = scale(0, defaultStartPitch, note)
+
+  def locrianScale(note: String) = scale(1, defaultStartPitch, note)
 
   def majorScale(note: String) = scale(2, defaultStartPitch, note)
 
   def dorianScale(note: String) = scale(3, defaultStartPitch, note)
 
-  //... TODO other modes
+  def phrygianScale(note: String) = scale(4, defaultStartPitch, note)
 
-  def minorScale(note: String) = scale(0, 2, note)
+  def lydianScale(note: String) = scale(5, defaultStartPitch, note)
 
-  //...
-
+  def mixolydianScale(note: String) = scale(6, defaultStartPitch, note)
+  
   // index are 0 based so the tone is 0, the 3rd is 2 etc
   def majorChord(note: String) = {
     val scale = majorScale(note)
