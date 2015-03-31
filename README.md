@@ -32,7 +32,7 @@ res0: List[String] = List(A2, C#2, E2)
 You can also use modes :
 
 ```scala
-scala> dorianScale("C").take(10).foreach(println)
+scala> modalScale("C", Modes.Dorian).take(10).foreach(println)
 C2
 D2
 D#2
@@ -43,5 +43,11 @@ A#3
 C3
 D3
 D#3
+```
 
+And get modal variations for a scale :
+
+```
+variants("D", Modes.Dorian)
+res1: List[String] = List(D Dorian, E Phrygian, F Lydian, G Mixolydian, A Aeolian, B Locrian, C Ionian)
 ```
