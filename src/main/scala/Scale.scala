@@ -1,4 +1,4 @@
-package scale
+package scales
 
 import Common._
 
@@ -54,7 +54,7 @@ case class Mode(degree: Int) {
   }
 }
 
-object Scale {
+class Scales(defaultStartPitch: Int) {
 
   object Modes {
     object Aeolian extends Mode(0)
@@ -71,8 +71,6 @@ object Scale {
   }
 
   import Modes._
-
-  val defaultStartPitch = 2
 
   val notes = List(A, A_sharp, B, C, C_sharp, D, D_sharp, E, F, F_sharp, G, G_sharp)
 
@@ -101,10 +99,24 @@ object Scale {
     }
   }
 
-
   def modalScale(note: Note, mode: Mode) = scaleGen(mode.degree, defaultStartPitch, note)
   def majorScale(note: Note) = modalScale(note, Ionian)
   def minorScale(note: Note) = modalScale(note, Aeolian)
+
+  def chordsForModaleScale(note: Note, mode: Mode) = {
+    //need to take 9 to loop to the next pitch for the last 2 chords of the scale
+    val scaleNotes = modalScale(note, mode).take(9).toList
+    scaleNotes.sliding(3).zipWithIndex.map { case (chord, index) =>
+      //step from tonal to 2nd + step from 2nd to 3rd
+      val stepToThird = stepsForMinorScale(mode.degree + index) + stepsForMinorScale(mode.degree + index+1)
+      val stepToFifth = stepToThird + stepsForMinorScale(mode.degree + index+2) + stepsForMinorScale(mode.degree + index+3)
+      val minorMajor = if(stepToThird == 3) "minor" else "major"
+      val dim = if(stepToFifth < 7) Some("dim") else None
+      (s"${chord(0)} $minorMajor${dim.map(" "+_) getOrElse ""}", chord)
+    }
+  }
+  def chordsForMajorScale(note: Note) = chordsForModaleScale(note, Ionian)
+  def chordsForMinorScale(note: Note) = chordsForModaleScale(note, Aeolian)
 
   def variants(note: Note, mode: Mode) = {
     val scale = modalScale(note, mode)
@@ -135,5 +147,7 @@ object Scale {
     List(scale(0), scale(2), scale(4), scale(6))
   }
 
-
 }
+
+//default start pitch = 2
+object Scales extends Scales(2)

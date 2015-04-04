@@ -1,10 +1,7 @@
-package scale
-
-import scala.annotation.tailrec
+package scales
 
 object Common {
 
-  //@tailrec 
   def loopListToStream[A](list: List[A]): Stream[A] = list.toStream #::: loopListToStream(list)
 
 }
