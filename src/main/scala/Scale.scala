@@ -104,15 +104,17 @@ class Scales(defaultStartPitch: Int) {
   def minorScale(note: Note) = modalScale(note, Aeolian)
 
   def chordsForModaleScale(note: Note, mode: Mode) = {
-    //need to take 9 to loop to the next pitch for the last 2 chords of the scale
-    val scaleNotes = modalScale(note, mode).take(9).toList
-    scaleNotes.sliding(3).zipWithIndex.map { case (chord, index) =>
+    val scaleNotes = modalScale(note, mode).take(7).toList
+    scaleNotes.zipWithIndex.map { case (n, i) =>
       //step from tonal to 2nd + step from 2nd to 3rd
-      val stepToThird = stepsForMinorScale(mode.degree + index) + stepsForMinorScale(mode.degree + index+1)
-      val stepToFifth = stepToThird + stepsForMinorScale(mode.degree + index+2) + stepsForMinorScale(mode.degree + index+3)
-      val minorMajor = if(stepToThird == 3) "minor" else "major"
-      val dim = if(stepToFifth < 7) Some("dim") else None
-      (s"${chord(0)} $minorMajor${dim.map(" "+_) getOrElse ""}", chord)
+      val stepToThird = stepsForMinorScale(mode.degree + i) + stepsForMinorScale(mode.degree + i+1)
+      val stepToFifth = stepToThird + stepsForMinorScale(mode.degree + i+2) + stepsForMinorScale(mode.degree + i+3)
+      val isMinor = stepToThird == 3
+      val isDim = stepToFifth < 7
+      val noteWithNoPitch = n.substring(0, n.length -1)
+      if(isDim) s"${noteWithNoPitch}5 dim ${minorDimChord(noteWithNoPitch)}"
+      else if(isMinor)s"${noteWithNoPitch} min ${minorChord(noteWithNoPitch)}"
+      else s"${noteWithNoPitch} maj ${majorChord(noteWithNoPitch)}"
     }
   }
   def chordsForMajorScale(note: Note) = chordsForModaleScale(note, Ionian)
@@ -135,6 +137,18 @@ class Scales(defaultStartPitch: Int) {
   def minorChord(note: Note) = {
     val scale = minorScale(note)
     List(scale(0), scale(2), scale(4))
+  }
+
+  def minorDimChord(note: Note) = {
+    val scale = minorScale(note)
+    val (fifthNote, fifthPitch) = (scale(4).substring(0,scale(4).length-1), scale(4).substring(scale(4).length-1, scale(4).length))
+    val dimFifth = {
+      val index = noteStream.indexWhere(_.toString == fifthNote)
+      noteStream(index + 11)
+    }
+    val pitch = if (fifthNote == A.toString) fifthPitch.toInt - 1 else fifthPitch
+
+    List(scale(0), scale(2), s"$dimFifth$pitch")
   }
 
   def major7Chord(note: Note) = {
