@@ -107,7 +107,7 @@ class Scales(defaultStartPitch: Int) {
   def majorScale(note: Note) = modalScale(note, Ionian)
   def minorScale(note: Note) = modalScale(note, Aeolian)
 
-  def chordsForModaleScale(note: Note, mode: Mode) = {
+  def chordsForModalScale(note: Note, mode: Mode) = {
     val scaleNotes = modalScale(note, mode).take(7).toList
     scaleNotes.zipWithIndex.map { case (np, i) =>
       //step from tonal to 2nd + step from 2nd to 3rd
@@ -115,13 +115,13 @@ class Scales(defaultStartPitch: Int) {
       val stepToFifth = stepToThird + stepsForMinorScale(mode.degree + i+2) + stepsForMinorScale(mode.degree + i+3)
       val isMinor = stepToThird == 3
       val isDim = stepToFifth < 7
-      if(isDim) s"${np.note}5 dim ${minorDimChord(np.note)}"
-      else if(isMinor)s"${np.note} min ${minorChord(np.note)}"
-      else s"${np.note} maj ${majorChord(np.note)}"
+      if(isDim) (s"${np.note}5 dim", minorDimChord(np.note))
+      else if(isMinor) (s"${np.note} min", minorChord(np.note))
+      else (s"${np.note} maj", majorChord(np.note))
     }
   }
-  def chordsForMajorScale(note: Note) = chordsForModaleScale(note, Ionian)
-  def chordsForMinorScale(note: Note) = chordsForModaleScale(note, Aeolian)
+  def chordsForMajorScale(note: Note) = chordsForModalScale(note, Ionian)
+  def chordsForMinorScale(note: Note) = chordsForModalScale(note, Aeolian)
 
   def variants(note: Note, mode: Mode) = {
     val scale = modalScale(note, mode)
@@ -134,12 +134,12 @@ class Scales(defaultStartPitch: Int) {
   // index are 0 based so the tone is 0, the 3rd is 2 etc
   def majorChord(note: Note) = {
     val scale = majorScale(note)
-    List(scale(0), scale(2), scale(4))
+    List(scale(0), scale(2), scale(4)).map(_.note)
   }
 
   def minorChord(note: Note) = {
     val scale = minorScale(note)
-    List(scale(0), scale(2), scale(4))
+    List(scale(0), scale(2), scale(4)).map(_.note)
   }
 
   def minorDimChord(note: Note) = {
@@ -149,17 +149,17 @@ class Scales(defaultStartPitch: Int) {
       noteStream(index + 11)
     }
     val pitch = if (scale(4).note == A) scale(4).pitch - 1 else scale(4).pitch
-    List(scale(0), scale(2), NoteWithPitch(dimFifth, pitch))
+    List(scale(0), scale(2), NoteWithPitch(dimFifth, pitch)).map(_.note)
   }
 
   def major7Chord(note: Note) = {
     val scale = majorScale(note)
-    List(scale(0), scale(2), scale(4), scale(6))
+    List(scale(0), scale(2), scale(4), scale(6)).map(_.note)
   }
 
   def minor7Chord(note: Note) = {
     val scale = minorScale(note)
-    List(scale(0), scale(2), scale(4), scale(6))
+    List(scale(0), scale(2), scale(4), scale(6)).map(_.note)
   }
 
 }
