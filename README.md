@@ -1,6 +1,6 @@
 ## Scales
 
-Music scales and chords (note + pitch) generator using Scala streams
+Music scales (notes + pitch) and chords generator using Scala streams
 
 ### Usage
 
@@ -21,25 +21,27 @@ A3
 B3
 C#3
 ```
-
 To find a minor scale, use `minorScale` method instead of `majorScale`
 
 Find a chord :
 
 ```
 scala> majorChord("A")
-res0: List[String] = List(A, C#, E)
+res0: List[scales.Note] = List(A, C#, E)
+
+scala> minor7Chord("C")
+res1: List[scales.Note] = List(C, D#, G, A#)
 ```
 
 Find a chord sequence for a scale :
 
 ```
 scala> chordsForMinorScale("C").take(7).foreach(println)
-(C min,List(C2, D#2, G2))
-(D5 dim,List(D2, F2, G#2))
+(C min,List(C, D#, G))
+(D5 dim,List(D, F, G#))
 (D# maj,List(D#, G, A#))
-(F min,List(F2, G#2, C3))
-(G min,List(G2, A#3, D3))
+(F min,List(F, G#, C))
+(G min,List(G, A#, D))
 (G# maj,List(G#, C, D#))
 (A# maj,List(A#, D, F))
 ```
@@ -60,12 +62,12 @@ D3
 D#3
 
 scala> chordsForModalScale("C", Modes.Dorian).take(7).foreach(println)
-(C min,List(C2, D#2, G2))
-(D min,List(D2, F2, A3))
+(C min,List(C, D#, G))
+(D min,List(D, F, A))
 (D# maj,List(D#, G, A#))
 (F maj,List(F, A, C))
-(G min,List(G2, A#3, D3))
-(A5 dim,List(A2, C2, D#2))
+(G min,List(G, A#, D))
+(A5 dim,List(A, C, D#))
 (A# maj,List(A#, D, F))
 ```
 
