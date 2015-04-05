@@ -16,6 +16,10 @@ case object F_sharp extends Note {override def toString = "F#"}
 case object G extends Note
 case object G_sharp extends Note {override def toString = "G#"}
 
+case class NoteWithPitch(note: Note, pitch: Int){
+  override def toString = s"$note$pitch"
+}
+
 object Note {
   def fromString(note: String): Option[Note] = {
     note match {
@@ -95,7 +99,7 @@ class Scales(defaultStartPitch: Int) {
     }
 
     scaleStream map {
-      case (degree, pitch, note) => s"$note$pitch"
+      case (degree, pitch, note) => NoteWithPitch(note, pitch)
     }
   }
 
@@ -105,16 +109,15 @@ class Scales(defaultStartPitch: Int) {
 
   def chordsForModaleScale(note: Note, mode: Mode) = {
     val scaleNotes = modalScale(note, mode).take(7).toList
-    scaleNotes.zipWithIndex.map { case (n, i) =>
+    scaleNotes.zipWithIndex.map { case (np, i) =>
       //step from tonal to 2nd + step from 2nd to 3rd
       val stepToThird = stepsForMinorScale(mode.degree + i) + stepsForMinorScale(mode.degree + i+1)
       val stepToFifth = stepToThird + stepsForMinorScale(mode.degree + i+2) + stepsForMinorScale(mode.degree + i+3)
       val isMinor = stepToThird == 3
       val isDim = stepToFifth < 7
-      val noteWithNoPitch = n.substring(0, n.length -1)
-      if(isDim) s"${noteWithNoPitch}5 dim ${minorDimChord(noteWithNoPitch)}"
-      else if(isMinor)s"${noteWithNoPitch} min ${minorChord(noteWithNoPitch)}"
-      else s"${noteWithNoPitch} maj ${majorChord(noteWithNoPitch)}"
+      if(isDim) s"${np.note}5 dim ${minorDimChord(np.note)}"
+      else if(isMinor)s"${np.note} min ${minorChord(np.note)}"
+      else s"${np.note} maj ${majorChord(np.note)}"
     }
   }
   def chordsForMajorScale(note: Note) = chordsForModaleScale(note, Ionian)
@@ -123,8 +126,8 @@ class Scales(defaultStartPitch: Int) {
   def variants(note: Note, mode: Mode) = {
     val scale = modalScale(note, mode)
     // a scale contains 7 unique degrees
-    scale.take(7).toList.zipWithIndex.map{ case (n, i) =>
-      s"${n.substring(0, n.length -1)} ${Mode(mode.degree+i).name}"
+    scale.take(7).toList.zipWithIndex.map{ case (np, i) =>
+      s"${np.note} ${Mode(mode.degree+i).name}"
     }
   }
   
@@ -141,14 +144,12 @@ class Scales(defaultStartPitch: Int) {
 
   def minorDimChord(note: Note) = {
     val scale = minorScale(note)
-    val (fifthNote, fifthPitch) = (scale(4).substring(0,scale(4).length-1), scale(4).substring(scale(4).length-1, scale(4).length))
     val dimFifth = {
-      val index = noteStream.indexWhere(_.toString == fifthNote)
+      val index = noteStream.indexWhere(_ == scale(4).note)
       noteStream(index + 11)
     }
-    val pitch = if (fifthNote == A.toString) fifthPitch.toInt - 1 else fifthPitch
-
-    List(scale(0), scale(2), s"$dimFifth$pitch")
+    val pitch = if (scale(4).note == A) scale(4).pitch - 1 else scale(4).pitch
+    List(scale(0), scale(2), NoteWithPitch(dimFifth, pitch))
   }
 
   def major7Chord(note: Note) = {
